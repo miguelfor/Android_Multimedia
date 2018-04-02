@@ -12,18 +12,22 @@ import javax.microedition.khronos.opengles.GL10;
 
 public class MyRenderer implements GLSurfaceView.Renderer {
 
+
     private Cubo cubo;
+    private Context context;
 
     private static float anguloCubo = 0;
     private static float speedCubo = -1.5f;
 
     public MyRenderer(Context context){
+        this.context = context;
         cubo = new Cubo();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-
+        cubo.cargarTextura(gl,context);
+        gl.glEnable(GL10.GL_TEXTURE_2D);
     }
 
     @Override
@@ -45,3 +49,4 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         anguloCubo += speedCubo;
     }
 }
+
