@@ -2,7 +2,9 @@ package co.com.miguelfor.multimedia;
 
 import android.content.Context;
 import android.net.Uri;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,13 +61,23 @@ public class GraficoFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
-
+    private GLSurfaceView lienzo;
     @Override
+    @Nullable
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+
+        lienzo = new GLSurfaceView(getActivity());
+        lienzo.setRenderer(new MyRenderer(getActivity()));
+
+        return lienzo;
+    }
+
+  /*  @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_grafico, container, false);
-    }
+    }*/
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
