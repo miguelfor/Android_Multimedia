@@ -125,18 +125,6 @@ public class AnimacionFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    public void OnClickPlay(View view) {
-
-        Log.e("mike","noseeee");
-        Toast.makeText(getView().getContext(), "fsdfsdfsdf", Toast.LENGTH_SHORT).show();
-
-        ImageView imageView = (ImageView) getView().findViewById(R.id.ic_star);
-
-        AnimatorSet animatorSet = (AnimatorSet) AnimatorInflater
-                .loadAnimator(getView().getContext(), R.animator.animation_star);
-        animatorSet.setTarget(imageView);
-        animatorSet.start();
-    }
 
     @Override
     public void onStart() {
