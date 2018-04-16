@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import co.com.miguelfor.multimedia.Fragment.AnimacionFragment;
+import co.com.miguelfor.multimedia.Fragment.AudioFragment;
 import co.com.miguelfor.multimedia.Fragment.GraficoFragment;
 import co.com.miguelfor.multimedia.Fragment.ImagenFragment;
 import co.com.miguelfor.multimedia.Fragment.VideoFragment;
@@ -23,7 +24,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
         , AnimacionFragment.OnFragmentInteractionListener
         , GraficoFragment.OnFragmentInteractionListener
-,VideoFragment.OnFragmentInteractionListener
+        ,VideoFragment.OnFragmentInteractionListener
+        ,AudioFragment.OnFragmentInteractionListener
         , ImagenFragment.OnFragmentInteractionListener{
 
     @Override
@@ -118,6 +120,9 @@ public class MainActivity extends AppCompatActivity
             Fragmentoseleccionado=true;
 
         } else if (id == R.id.nav_audio) {
+            AudioFragment  fragmentgw = new AudioFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.Contenedor, fragmentgw).commit();
+            Fragmentoseleccionado=true;
 
         } else if (id == R.id.nav_video) {
 
