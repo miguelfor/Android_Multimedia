@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +16,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +24,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import co.com.miguelfor.multimedia.BuildConfig;
 import co.com.miguelfor.multimedia.R;
 import static android.app.Activity.RESULT_OK;
 
@@ -39,6 +49,8 @@ public class ImagenFragment extends Fragment {
             Manifest.permission.CAMERA,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+
+    String mCurrentPhotoPath;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -93,7 +105,6 @@ public class ImagenFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "fdfdfdgdf", Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(i, 1);
             }
@@ -109,12 +120,39 @@ public class ImagenFragment extends Fragment {
                 File imagenFolder = new File(Environment.getExternalStorageDirectory(), "CamaraFolder");
                 imagenFolder.mkdirs();
                 File imagen = new File(imagenFolder, "foto.jpg");
-                Uri uriImagen = Uri.fromFile(imagen);
+
+
+                Uri uriImagen = null;
+                try {
+                    uriImagen = FileProvider.getUriForFile(getContext()
+                            , BuildConfig.APPLICATION_ID + ".provider",  createImageFile());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // Uri uriImagen = Uri.fromFile(imagen);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImagen);
                 startActivityForResult(cameraIntent, REQUEST_CODE_CAMARA);
             }
         });
         return rootView;
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        //String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "fotomike";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -159,31 +197,6 @@ public class ImagenFragment extends Fragment {
 
     }
 
-    /*public void onActivityResult(int requestCode, int resultCode, Intent Data) {
-        super.onActivityResult(requestCode, resultCode, Data);
-        if (requestCode == 2 && resultCode == RESULT_OK && null != Data) {
-            Uri imagenseleccionada = Data.getData();
-            String[] path = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getActivity().getContentResolver().query(imagenseleccionada, path, null, null, null);
-            cursor.moveToFirst();
-            int columna = cursor.getColumnIndex(path[0]);
-            String pathimagen = cursor.getString(columna);
-            cursor.close();
-            bitmap = BitmapFactory.decodeFile(pathimagen);
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            int height = bitmap.getHeight();
-            int width = bitmap.getWidth();
-            float scaleA = ((float) (width / 2)) / width;
-            float scaleB = ((float) (width / 2)) / width;
-            Matrix matrix = new Matrix();
-            matrix.postScale(scaleA, scaleB);
-            Bitmap nuevaimagen = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
-            iv.setImageBitmap(nuevaimagen);
-
-        }
-
-    }*/
-
     public void onActivityResult(int requestCode, int resultCode, Intent Data){
         super.onActivityResult(requestCode,resultCode,Data);
 
@@ -209,9 +222,25 @@ public class ImagenFragment extends Fragment {
         }
 
         if (requestCode == REQUEST_CODE_CAMARA && resultCode == RESULT_OK){
-            Toast.makeText(getActivity(), "Se ha guardado la imagen:\n" + Environment.getExternalStorageDirectory() + "/CamaraFolder/foto.jpg", Toast.LENGTH_LONG).show();
 
-            Bitmap bitmap = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/CamaraFolder/foto.jpg");
+            Uri imageUri = Uri.parse(mCurrentPhotoPath);
+            File file = new File(imageUri.getPath());
+            try {
+                InputStream ims = new FileInputStream(file);
+                iv.setImageBitmap(BitmapFactory.decodeStream(ims));
+            } catch (FileNotFoundException e) {
+                return;
+            }
+
+            // ScanFile so it will be appeared on Gallery
+            MediaScannerConnection.scanFile( getContext(),
+                    new String[]{imageUri.getPath()}, null,
+                    new MediaScannerConnection.OnScanCompletedListener() {
+                        public void onScanCompleted(String path, Uri uri) {
+                        }
+                    });
+             /*
+              Bitmap bitmap = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory()+ "Camera/foto.jpg"  );
 
             int height = bitmap.getHeight();
             int width = bitmap.getWidth();
@@ -224,7 +253,7 @@ public class ImagenFragment extends Fragment {
 
             Bitmap nuevaImagen = Bitmap.createBitmap(bitmap,0,0,width,height,matrix,true);
 
-            iv.setImageBitmap(nuevaImagen);
+            iv.setImageBitmap(nuevaImagen);*/
 
         }else{
             Toast.makeText(getActivity(), "No se guardó correctamente la imagen en el dispositivo", Toast.LENGTH_LONG).show();
