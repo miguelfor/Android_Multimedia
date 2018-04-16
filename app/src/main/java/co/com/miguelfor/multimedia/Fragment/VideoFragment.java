@@ -4,6 +4,11 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -11,6 +16,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +26,14 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+import co.com.miguelfor.multimedia.BuildConfig;
 import co.com.miguelfor.multimedia.R;
 
 import static android.app.Activity.RESULT_OK;
@@ -35,9 +48,11 @@ import static android.app.Activity.RESULT_OK;
  */
 public class VideoFragment extends Fragment {
 
-    private Button btnVideo;
+    private Button btnVideo1;
+    private Button btnVideo2;
     private VideoView videoView;
-    private Uri videoUri;
+    Uri videoUri;
+    String mCurrentPhotoPath;
     private static int REQUEST_CODE = 1;
 
     private static final String[] PERMISOS = {
@@ -141,25 +156,38 @@ public class VideoFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        btnVideo =   view.findViewById(R.id.botonAbrir);
+        btnVideo1 =   view.findViewById(R.id.botonAbrir);
+        btnVideo2 =   view.findViewById(R.id.botonCamara);
         videoView =   view.findViewById(R.id.videoView);
 
-        btnVideo.setOnClickListener(new View.OnClickListener() {
+        btnVideo1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, 2);
+            }
+        });
 
-                File videosFolder = new File(Environment.getExternalStorageDirectory(), "VideosNextU");
 
-                videosFolder.mkdirs();
+        btnVideo2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-                File video = new File(videosFolder, "video.mp4");
+                Intent cameraIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                File videoFolder = new File(Environment.getExternalStorageDirectory(), "CamaraFolder");
+                videoFolder.mkdirs();
 
-                videoUri = Uri.fromFile(video);
+                Uri uriImagen = null;
+                try {
+                    uriImagen = FileProvider.getUriForFile(getContext()
+                            , BuildConfig.APPLICATION_ID + ".provider",  createFile());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                // Uri uriImagen = Uri.fromFile(imagen);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImagen);
+                startActivityForResult(cameraIntent, REQUEST_CODE);
 
-                videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
-
-                startActivityForResult(videoIntent, REQUEST_CODE);
             }
         });
     }
@@ -167,13 +195,31 @@ public class VideoFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
-            Toast.makeText(getActivity(), "Se guardó el video en:\n"+ Environment.getExternalStorageDirectory() + "/VideosNextU/video.mp4", Toast.LENGTH_LONG).show();
+        if(requestCode ==2 && resultCode==RESULT_OK && null !=data){
+            Uri imagenseleccionada = data.getData();
+            String[] path = {MediaStore.Video.Media.DATA};
+            Cursor cursor = getActivity().getContentResolver().query(imagenseleccionada,path,null,null,null);
+            cursor.moveToFirst();
+            int columna = cursor.getColumnIndex(path[0]);
+            String pathimagen = cursor.getString(columna);
+            cursor.close();
+
 
             MediaController mediaController = new MediaController(getActivity());
-
             videoView.setMediaController(mediaController);
 
+          videoView.setVideoURI(Uri.parse( pathimagen));
+            videoView.start();
+
+            mediaController.setAnchorView(videoView);
+
+
+
+        }
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            MediaController mediaController = new MediaController(getActivity());
+            videoView.setMediaController(mediaController);
             videoView.setVideoURI(videoUri);
             videoView.start();
 
@@ -181,5 +227,24 @@ public class VideoFragment extends Fragment {
         }else{
             Toast.makeText(getActivity(), "Ha ocurrido un error al guardar el video", Toast.LENGTH_SHORT).show();
         }
+    }
+
+
+    private File createFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        //String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "fotomike";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_DCIM), "Camera");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".mp4",         /* suffix */
+                storageDir      /* directory */
+        );
+        videoUri = Uri.fromFile(image);
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        return image;
     }
 }

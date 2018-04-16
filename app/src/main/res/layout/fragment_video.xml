@@ -4,35 +4,41 @@
     android:layout_height="match_parent"
     tools:context="co.com.miguelfor.multimedia.Fragment.VideoFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <VideoView
-        android:id="@+id/videoView"
-        android:layout_width="match_parent"
-        android:layout_height="400dp" />
+
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:orientation="horizontal"
-        >
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="abrir"
-            android:id="@+id/botonAbrir"
-            android:backgroundTint="@color/colorAccent"
-            />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="capturar"
-            android:id="@+id/botonCamara"
-            android:backgroundTint="@color/colorAccent"
-            />
+        <VideoView
+            android:id="@+id/videoView"
+            android:layout_width="match_parent"
+            android:layout_height="400dp" />
 
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/botonAbrir"
+                android:layout_width="193dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="ABRIR" />
+            <Button
+                android:id="@+id/botonCamara"
+                android:layout_width="193dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:text="CAPTURAR" />
+
+        </LinearLayout>
     </LinearLayout>
 
 
