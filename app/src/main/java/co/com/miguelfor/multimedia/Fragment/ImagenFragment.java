@@ -1,24 +1,46 @@
 package co.com.miguelfor.multimedia.Fragment;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.Toast;
+import java.io.File;
 import co.com.miguelfor.multimedia.R;
+import static android.app.Activity.RESULT_OK;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ImagenFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ImagenFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class ImagenFragment extends Fragment {
+
+
+
+    Bitmap bitmap = null;
+    ImageView iv;
+    private static final int REQUEST_CODE = 1;
+    private static final int REQUEST_CODE_CAMARA = 2;
+    private static final String[] PERMISOS = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -31,17 +53,9 @@ public class ImagenFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     public ImagenFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ImagenFragment.
-     */
+
     // TODO: Rename and change types and number of parameters
     public static ImagenFragment newInstance(String param1, String param2) {
         ImagenFragment fragment = new ImagenFragment();
@@ -59,13 +73,48 @@ public class ImagenFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        int leer = ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
+        int leer1 = ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (leer == PackageManager.PERMISSION_DENIED || leer1 == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this.getActivity(), PERMISOS, REQUEST_CODE);
+        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View rootView =    inflater.inflate(R.layout.fragment_imagen, container, false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_imagen, container, false);
+        iv = rootView.findViewById(R.id.iv);
+
+        Button button = rootView.findViewById(R.id.abrir);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "fdfdfdgdf", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, 1);
+            }
+        });
+
+
+        Button button2 = rootView.findViewById(R.id.capturar);
+
+        button2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                File imagenFolder = new File(Environment.getExternalStorageDirectory(), "CamaraFolder");
+                imagenFolder.mkdirs();
+                File imagen = new File(imagenFolder, "foto.jpg");
+                Uri uriImagen = Uri.fromFile(imagen);
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, uriImagen);
+                startActivityForResult(cameraIntent, REQUEST_CODE_CAMARA);
+            }
+        });
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -92,18 +141,95 @@ public class ImagenFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+    }
+
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    @Override
+    public void onStart() {
+
+        super.onStart();
+
+    }
+
+    /*public void onActivityResult(int requestCode, int resultCode, Intent Data) {
+        super.onActivityResult(requestCode, resultCode, Data);
+        if (requestCode == 2 && resultCode == RESULT_OK && null != Data) {
+            Uri imagenseleccionada = Data.getData();
+            String[] path = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getActivity().getContentResolver().query(imagenseleccionada, path, null, null, null);
+            cursor.moveToFirst();
+            int columna = cursor.getColumnIndex(path[0]);
+            String pathimagen = cursor.getString(columna);
+            cursor.close();
+            bitmap = BitmapFactory.decodeFile(pathimagen);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            int height = bitmap.getHeight();
+            int width = bitmap.getWidth();
+            float scaleA = ((float) (width / 2)) / width;
+            float scaleB = ((float) (width / 2)) / width;
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleA, scaleB);
+            Bitmap nuevaimagen = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+            iv.setImageBitmap(nuevaimagen);
+
+        }
+
+    }*/
+
+    public void onActivityResult(int requestCode, int resultCode, Intent Data){
+        super.onActivityResult(requestCode,resultCode,Data);
+
+        if(requestCode ==1 && resultCode==RESULT_OK && null !=Data){
+            Uri imagenseleccionada = Data.getData();
+            String[] path = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getActivity().getContentResolver().query(imagenseleccionada,path,null,null,null);
+            cursor.moveToFirst();
+            int columna = cursor.getColumnIndex(path[0]);
+            String pathimagen = cursor.getString(columna);
+            cursor.close();
+            bitmap = BitmapFactory.decodeFile(pathimagen);
+            BitmapFactory.Options options= new BitmapFactory.Options();
+            int height= bitmap.getHeight();
+            int width=bitmap.getWidth();
+            float scaleA =((float)(width/2))/width;
+            float scaleB =((float)(height/2))/height;
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleA,scaleB);
+            Bitmap nuevaimagen= Bitmap.createBitmap(bitmap,0,0,width,height,matrix,true);
+            iv.setImageBitmap(nuevaimagen);
+
+        }
+
+        if (requestCode == REQUEST_CODE_CAMARA && resultCode == RESULT_OK){
+            Toast.makeText(getActivity(), "Se ha guardado la imagen:\n" + Environment.getExternalStorageDirectory() + "/CamaraFolder/foto.jpg", Toast.LENGTH_LONG).show();
+
+            Bitmap bitmap = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory() + "/CamaraFolder/foto.jpg");
+
+            int height = bitmap.getHeight();
+            int width = bitmap.getWidth();
+
+            float scaleA = ((float)(width/2))/width;
+            float scaleB = ((float)(height/2))/height;
+
+            Matrix matrix = new Matrix();
+            matrix.postScale(scaleA,scaleB);
+
+            Bitmap nuevaImagen = Bitmap.createBitmap(bitmap,0,0,width,height,matrix,true);
+
+            iv.setImageBitmap(nuevaImagen);
+
+        }else{
+            Toast.makeText(getActivity(), "No se guardó correctamente la imagen en el dispositivo", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
 }

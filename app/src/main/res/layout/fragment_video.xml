@@ -5,9 +5,35 @@
     tools:context="co.com.miguelfor.multimedia.Fragment.VideoFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <VideoView
+        android:id="@+id/videoView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="400dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="abrir"
+            android:id="@+id/botonAbrir"
+            android:backgroundTint="@color/colorAccent"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="capturar"
+            android:id="@+id/botonCamara"
+            android:backgroundTint="@color/colorAccent"
+            />
+
+    </LinearLayout>
+
 
 </FrameLayout>

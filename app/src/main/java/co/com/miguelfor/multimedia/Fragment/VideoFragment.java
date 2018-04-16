@@ -1,14 +1,29 @@
 package co.com.miguelfor.multimedia.Fragment;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.MediaController;
+import android.widget.Toast;
+import android.widget.VideoView;
+
+import java.io.File;
 
 import co.com.miguelfor.multimedia.R;
+
+import static android.app.Activity.RESULT_OK;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -19,6 +34,17 @@ import co.com.miguelfor.multimedia.R;
  * create an instance of this fragment.
  */
 public class VideoFragment extends Fragment {
+
+    private Button btnVideo;
+    private VideoView videoView;
+    private Uri videoUri;
+    private static int REQUEST_CODE = 1;
+
+    private static final String[] PERMISOS = {
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -58,6 +84,10 @@ public class VideoFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+        int leer = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(leer == PackageManager.PERMISSION_DENIED){
+            ActivityCompat.requestPermissions(getActivity(),PERMISOS,REQUEST_CODE);
         }
     }
 
@@ -105,5 +135,51 @@ public class VideoFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        btnVideo =   view.findViewById(R.id.botonAbrir);
+        videoView =   view.findViewById(R.id.videoView);
+
+        btnVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent videoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+
+                File videosFolder = new File(Environment.getExternalStorageDirectory(), "VideosNextU");
+
+                videosFolder.mkdirs();
+
+                File video = new File(videosFolder, "video.mp4");
+
+                videoUri = Uri.fromFile(video);
+
+                videoIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+
+                startActivityForResult(videoIntent, REQUEST_CODE);
+            }
+        });
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+            Toast.makeText(getActivity(), "Se guardó el video en:\n"+ Environment.getExternalStorageDirectory() + "/VideosNextU/video.mp4", Toast.LENGTH_LONG).show();
+
+            MediaController mediaController = new MediaController(getActivity());
+
+            videoView.setMediaController(mediaController);
+
+            videoView.setVideoURI(videoUri);
+            videoView.start();
+
+            mediaController.setAnchorView(videoView);
+        }else{
+            Toast.makeText(getActivity(), "Ha ocurrido un error al guardar el video", Toast.LENGTH_SHORT).show();
+        }
     }
 }

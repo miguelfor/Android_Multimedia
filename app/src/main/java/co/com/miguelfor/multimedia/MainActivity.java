@@ -4,7 +4,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,11 +13,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
-import android.widget.Toast;
+
+import co.com.miguelfor.multimedia.Fragment.AnimacionFragment;
+import co.com.miguelfor.multimedia.Fragment.GraficoFragment;
+import co.com.miguelfor.multimedia.Fragment.ImagenFragment;
+import co.com.miguelfor.multimedia.Fragment.VideoFragment;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener ,AnimacionFragment.OnFragmentInteractionListener, GraficoFragment.OnFragmentInteractionListener  {
+        implements NavigationView.OnNavigationItemSelectedListener
+        , AnimacionFragment.OnFragmentInteractionListener
+        , GraficoFragment.OnFragmentInteractionListener
+,VideoFragment.OnFragmentInteractionListener
+        , ImagenFragment.OnFragmentInteractionListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,10 +113,17 @@ public class MainActivity extends AppCompatActivity
             Fragmentoseleccionado=true;
 
         } else if (id == R.id.nav_imagen) {
+            ImagenFragment  fragmentgw = new ImagenFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.Contenedor, fragmentgw).commit();
+            Fragmentoseleccionado=true;
 
         } else if (id == R.id.nav_audio) {
 
         } else if (id == R.id.nav_video) {
+
+            VideoFragment fragmentgw = new VideoFragment();
+            getSupportFragmentManager().beginTransaction().replace(R.id.Contenedor, fragmentgw).commit();
+            Fragmentoseleccionado=true;
 
         }
 

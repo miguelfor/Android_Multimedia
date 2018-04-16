@@ -1,13 +1,11 @@
-package co.com.miguelfor.multimedia;
+package co.com.miguelfor.multimedia.Fragment;
 
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +13,8 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
+import co.com.miguelfor.multimedia.R;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,8 +40,6 @@ public class AnimacionFragment extends Fragment {
     public AnimacionFragment() {
         // Required empty public constructor
     }
-
-
 
     /**
      * Use this factory method to create a new instance of
