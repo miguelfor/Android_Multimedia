@@ -26,9 +26,9 @@ public class Cubo {
 
     private float texturaCoord[] = {
             0.0f, 0.5f,
-            0.5f,0.5f,
-            0.0f,0.0f,
-            0.5f,0.0f
+            0.5f, 0.5f,
+            0.0f, 0.0f,
+            0.5f, 0.0f
     };
 
     private int numCaras = 6;
@@ -36,11 +36,11 @@ public class Cubo {
     private float[] vertices = {
             -0.5f, -0.5f, 0.0f,
             0.5f, -0.5f, 0.0f,
-            -0.5f,  0.5f, 0.0f,
-            0.5f,  0.5f, 0.0f
+            -0.5f, 0.5f, 0.0f,
+            0.5f, 0.5f, 0.0f
     };
 
-    public Cubo(){
+    public Cubo() {
         ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4);
         vbb.order(ByteOrder.nativeOrder());
 
@@ -48,14 +48,14 @@ public class Cubo {
         vertexBuffer.put(vertices);
         vertexBuffer.position(0);
 
-        ByteBuffer tbb = ByteBuffer.allocateDirect(texturaCoord.length*4);
+        ByteBuffer tbb = ByteBuffer.allocateDirect(texturaCoord.length * 4);
         tbb.order(ByteOrder.nativeOrder());
         texturaBuffer = tbb.asFloatBuffer();
         texturaBuffer.put(texturaCoord);
         texturaBuffer.position(0);
     }
 
-    public void dibujar(GL10 gl){
+    public void dibujar(GL10 gl) {
         gl.glFrontFace(GL10.GL_CCW);
         gl.glEnable(GL10.GL_CULL_FACE);
         gl.glCullFace(GL10.GL_BACK);
@@ -64,7 +64,7 @@ public class Cubo {
         gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);
 
         gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-        gl.glTexCoordPointer(2, GL10.GL_FLOAT,0, texturaBuffer);
+        gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, texturaBuffer);
 
         gl.glPushMatrix();
         gl.glTranslatef(0.0f, 0.0f, 0.5f);
@@ -72,33 +72,33 @@ public class Cubo {
         gl.glPopMatrix();
 
         gl.glPushMatrix();
-        gl.glRotatef(270.0f, 0.0f ,0.5f, 0.0f);
+        gl.glRotatef(270.0f, 0.0f, 0.5f, 0.0f);
         gl.glTranslatef(0.0f, 0.f, 0.5f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP,0, 4);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
         gl.glPopMatrix();
 
         gl.glPushMatrix();
-        gl.glRotatef(180.0f, 0.0f ,0.5f, 0.0f);
+        gl.glRotatef(180.0f, 0.0f, 0.5f, 0.0f);
         gl.glTranslatef(0.0f, 0.f, 0.5f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP,0, 4);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
         gl.glPopMatrix();
 
         gl.glPushMatrix();
-        gl.glRotatef(90.0f, 0.0f ,0.5f, 0.0f);
+        gl.glRotatef(90.0f, 0.0f, 0.5f, 0.0f);
         gl.glTranslatef(0.0f, 0.f, 0.5f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP,0, 4);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
         gl.glPopMatrix();
 
         gl.glPushMatrix();
-        gl.glRotatef(270.0f, 0.5f ,0.0f, 0.0f);
+        gl.glRotatef(270.0f, 0.5f, 0.0f, 0.0f);
         gl.glTranslatef(0.0f, 0.f, 0.5f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP,0, 4);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
         gl.glPopMatrix();
 
         gl.glPushMatrix();
-        gl.glRotatef(90.0f, 0.5f ,0.0f, 0.0f);
+        gl.glRotatef(90.0f, 0.5f, 0.0f, 0.0f);
         gl.glTranslatef(0.0f, 0.f, 0.5f);
-        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP,0, 4);
+        gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
         gl.glPopMatrix();
 
         gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
@@ -106,7 +106,7 @@ public class Cubo {
         gl.glDisable(GL10.GL_CULL_FACE);
     }
 
-    public void cargarTextura(GL10 gl, Context context){
+    public void cargarTextura(GL10 gl, Context context) {
         gl.glGenTextures(1, texturaIDs, 0);
 
         gl.glBindTexture(GL10.GL_TEXTURE_2D, texturaIDs[0]);
@@ -118,15 +118,16 @@ public class Cubo {
 
         Bitmap bitmap;
 
-        try{
+        try {
             bitmap = BitmapFactory.decodeStream(istream);
-        }finally {
-            try{
+        } finally {
+            try {
                 istream.close();
-            }catch(IOException e){}
+            } catch (IOException e) {
+            }
         }
 
-        GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0 , bitmap, 0);
+        GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
         bitmap.recycle();
     }
 

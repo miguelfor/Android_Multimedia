@@ -19,14 +19,14 @@ public class MyRenderer implements GLSurfaceView.Renderer {
     private static float anguloCubo = 0;
     private static float speedCubo = -1.5f;
 
-    public MyRenderer(Context context){
+    public MyRenderer(Context context) {
         this.context = context;
         cubo = new Cubo();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        cubo.cargarTextura(gl,context);
+        cubo.cargarTextura(gl, context);
         gl.glEnable(GL10.GL_TEXTURE_2D);
     }
 
@@ -42,7 +42,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         gl.glLoadIdentity();
         gl.glTranslatef(0.0f, 0.0f, -0.5f);
         gl.glScalef(0.8f, 0.8f, 0.8f);
-        gl.glRotatef(anguloCubo,1.0f,1.0f,0.0f);
+        gl.glRotatef(anguloCubo, 1.0f, 1.0f, 0.0f);
 
         cubo.dibujar(gl);
 

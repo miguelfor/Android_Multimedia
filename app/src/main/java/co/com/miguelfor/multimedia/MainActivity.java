@@ -24,9 +24,9 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
         , AnimacionFragment.OnFragmentInteractionListener
         , GraficoFragment.OnFragmentInteractionListener
-        ,VideoFragment.OnFragmentInteractionListener
-        ,AudioFragment.OnFragmentInteractionListener
-        , ImagenFragment.OnFragmentInteractionListener{
+        , VideoFragment.OnFragmentInteractionListener
+        , AudioFragment.OnFragmentInteractionListener
+        , ImagenFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +36,11 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Ejemplo Multimedia", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -56,10 +55,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-
     }
 
-    public void OnClickPlay(View view){
+    public void OnClickPlay(View view) {
 
     }
 
@@ -101,39 +99,36 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-       // AnimacionFragment fragment = null;
-        Boolean Fragmentoseleccionado=false;
+        // AnimacionFragment fragment = null;
+        Boolean Fragmentoseleccionado = false;
 
         if (id == R.id.nav_animaciones) {
             AnimacionFragment fragment = new AnimacionFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.Contenedor, fragment).commit();
-            Fragmentoseleccionado=true;
+            Fragmentoseleccionado = true;
             // Handle the camera action
         } else if (id == R.id.nav_graficos) {
-            GraficoFragment  fragmentg = new GraficoFragment();
+            GraficoFragment fragmentg = new GraficoFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.Contenedor, fragmentg).commit();
-            Fragmentoseleccionado=true;
+            Fragmentoseleccionado = true;
 
         } else if (id == R.id.nav_imagen) {
-            ImagenFragment  fragmentgw = new ImagenFragment();
+            ImagenFragment fragmentgw = new ImagenFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.Contenedor, fragmentgw).commit();
-            Fragmentoseleccionado=true;
+            Fragmentoseleccionado = true;
 
         } else if (id == R.id.nav_audio) {
-            AudioFragment  fragmentgw = new AudioFragment();
+            AudioFragment fragmentgw = new AudioFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.Contenedor, fragmentgw).commit();
-            Fragmentoseleccionado=true;
+            Fragmentoseleccionado = true;
 
         } else if (id == R.id.nav_video) {
 
             VideoFragment fragmentgw = new VideoFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.Contenedor, fragmentgw).commit();
-            Fragmentoseleccionado=true;
+            Fragmentoseleccionado = true;
 
         }
-
-
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
