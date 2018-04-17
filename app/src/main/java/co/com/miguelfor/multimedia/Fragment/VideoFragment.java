@@ -22,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -48,6 +49,7 @@ import static android.app.Activity.RESULT_OK;
  */
 public class VideoFragment extends Fragment {
 
+    private TextView tvRuta;
     private Button btnVideo1;
     private Button btnVideo2;
     private VideoView videoView;
@@ -100,9 +102,10 @@ public class VideoFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
         int leer = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if(leer == PackageManager.PERMISSION_DENIED){
-            ActivityCompat.requestPermissions(getActivity(),PERMISOS,REQUEST_CODE);
+        if (leer == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(getActivity(), PERMISOS, REQUEST_CODE);
         }
     }
 
@@ -110,7 +113,9 @@ public class VideoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_video, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_video, container, false);
+        tvRuta = rootView.findViewById(R.id.tvRuta);
+        return rootView;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -156,9 +161,9 @@ public class VideoFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        btnVideo1 =   view.findViewById(R.id.botonAbrir);
-        btnVideo2 =   view.findViewById(R.id.botonCamara);
-        videoView =   view.findViewById(R.id.videoView);
+        btnVideo1 = view.findViewById(R.id.botonAbrir);
+        btnVideo2 = view.findViewById(R.id.botonCamara);
+        videoView = view.findViewById(R.id.videoView);
 
         btnVideo1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,7 +185,7 @@ public class VideoFragment extends Fragment {
                 Uri uriImagen = null;
                 try {
                     uriImagen = FileProvider.getUriForFile(getContext()
-                            , BuildConfig.APPLICATION_ID + ".provider",  createFile());
+                            , BuildConfig.APPLICATION_ID + ".provider", createFile());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -191,14 +196,15 @@ public class VideoFragment extends Fragment {
             }
         });
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode ==2 && resultCode==RESULT_OK && null !=data){
+        if (requestCode == 2 && resultCode == RESULT_OK && null != data) {
             Uri imagenseleccionada = data.getData();
             String[] path = {MediaStore.Video.Media.DATA};
-            Cursor cursor = getActivity().getContentResolver().query(imagenseleccionada,path,null,null,null);
+            Cursor cursor = getActivity().getContentResolver().query(imagenseleccionada, path, null, null, null);
             cursor.moveToFirst();
             int columna = cursor.getColumnIndex(path[0]);
             String pathimagen = cursor.getString(columna);
@@ -208,23 +214,24 @@ public class VideoFragment extends Fragment {
             MediaController mediaController = new MediaController(getActivity());
             videoView.setMediaController(mediaController);
 
-          videoView.setVideoURI(Uri.parse( pathimagen));
+            videoView.setVideoURI(Uri.parse(pathimagen));
             videoView.start();
 
             mediaController.setAnchorView(videoView);
-
+            tvRuta.setText("Ruta:" + pathimagen);
 
 
         }
 
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK){
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             MediaController mediaController = new MediaController(getActivity());
             videoView.setMediaController(mediaController);
             videoView.setVideoURI(videoUri);
             videoView.start();
 
             mediaController.setAnchorView(videoView);
-        }else{
+            tvRuta.setText("Ruta:" + videoUri);
+        } else if (resultCode != RESULT_OK) {
             Toast.makeText(getActivity(), "Ha ocurrido un error al guardar el video", Toast.LENGTH_SHORT).show();
         }
     }

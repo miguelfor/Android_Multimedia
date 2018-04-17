@@ -22,7 +22,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,12 +35,14 @@ import java.util.Date;
 
 import co.com.miguelfor.multimedia.BuildConfig;
 import co.com.miguelfor.multimedia.R;
+
 import static android.app.Activity.RESULT_OK;
 
 
 public class ImagenFragment extends Fragment {
 
 
+    private TextView tvRuta;
 
     Bitmap bitmap = null;
     ImageView iv;
@@ -97,9 +101,10 @@ public class ImagenFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView =    inflater.inflate(R.layout.fragment_imagen, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_imagen, container, false);
         // Inflate the layout for this fragment
         iv = rootView.findViewById(R.id.iv);
+        tvRuta = rootView.findViewById(R.id.tvRuta);
 
         Button button = rootView.findViewById(R.id.abrir);
         button.setOnClickListener(new View.OnClickListener() {
@@ -107,6 +112,8 @@ public class ImagenFragment extends Fragment {
             public void onClick(View view) {
                 Intent i = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(i, 1);
+
+
             }
         });
 
@@ -120,12 +127,10 @@ public class ImagenFragment extends Fragment {
                 File imagenFolder = new File(Environment.getExternalStorageDirectory(), "CamaraFolder");
                 imagenFolder.mkdirs();
                 File imagen = new File(imagenFolder, "foto.jpg");
-
-
                 Uri uriImagen = null;
                 try {
                     uriImagen = FileProvider.getUriForFile(getContext()
-                            , BuildConfig.APPLICATION_ID + ".provider",  createImageFile());
+                            , BuildConfig.APPLICATION_ID + ".provider", createImageFile());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -141,7 +146,7 @@ public class ImagenFragment extends Fragment {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         //String imageFileName = "JPEG_" + timeStamp + "_";
-        String imageFileName = "fotomike";
+        String imageFileName = "foto";
         File storageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DCIM), "Camera");
         File image = File.createTempFile(
@@ -197,43 +202,46 @@ public class ImagenFragment extends Fragment {
 
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent Data){
-        super.onActivityResult(requestCode,resultCode,Data);
+    public void onActivityResult(int requestCode, int resultCode, Intent Data) {
+        super.onActivityResult(requestCode, resultCode, Data);
 
-        if(requestCode ==1 && resultCode==RESULT_OK && null !=Data){
+        if (requestCode == 1 && resultCode == RESULT_OK && null != Data) {
             Uri imagenseleccionada = Data.getData();
             String[] path = {MediaStore.Images.Media.DATA};
-            Cursor cursor = getActivity().getContentResolver().query(imagenseleccionada,path,null,null,null);
+            Cursor cursor = getActivity().getContentResolver().query(imagenseleccionada, path, null, null, null);
             cursor.moveToFirst();
             int columna = cursor.getColumnIndex(path[0]);
             String pathimagen = cursor.getString(columna);
             cursor.close();
             bitmap = BitmapFactory.decodeFile(pathimagen);
-            BitmapFactory.Options options= new BitmapFactory.Options();
-            int height= bitmap.getHeight();
-            int width=bitmap.getWidth();
-            float scaleA =((float)(width/2))/width;
-            float scaleB =((float)(height/2))/height;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            int height = bitmap.getHeight();
+            int width = bitmap.getWidth();
+            float scaleA = ((float) (width / 2)) / width;
+            float scaleB = ((float) (height / 2)) / height;
             Matrix matrix = new Matrix();
-            matrix.postScale(scaleA,scaleB);
-            Bitmap nuevaimagen= Bitmap.createBitmap(bitmap,0,0,width,height,matrix,true);
+            matrix.postScale(scaleA, scaleB);
+            Bitmap nuevaimagen = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
             iv.setImageBitmap(nuevaimagen);
+            tvRuta.setText("RUTA: " + pathimagen);
+
 
         }
 
-        if (requestCode == REQUEST_CODE_CAMARA && resultCode == RESULT_OK){
+        if (requestCode == REQUEST_CODE_CAMARA && resultCode == RESULT_OK) {
 
             Uri imageUri = Uri.parse(mCurrentPhotoPath);
             File file = new File(imageUri.getPath());
             try {
                 InputStream ims = new FileInputStream(file);
                 iv.setImageBitmap(BitmapFactory.decodeStream(ims));
+                tvRuta.setText("RUTA: " + imageUri.getPath());
             } catch (FileNotFoundException e) {
                 return;
             }
 
             // ScanFile so it will be appeared on Gallery
-            MediaScannerConnection.scanFile( getContext(),
+            MediaScannerConnection.scanFile(getContext(),
                     new String[]{imageUri.getPath()}, null,
                     new MediaScannerConnection.OnScanCompletedListener() {
                         public void onScanCompleted(String path, Uri uri) {
@@ -255,7 +263,7 @@ public class ImagenFragment extends Fragment {
 
             iv.setImageBitmap(nuevaImagen);*/
 
-        }else{
+        } else if (resultCode != RESULT_OK) {
             Toast.makeText(getActivity(), "No se guardó correctamente la imagen en el dispositivo", Toast.LENGTH_LONG).show();
         }
 
